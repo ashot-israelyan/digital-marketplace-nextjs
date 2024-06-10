@@ -24,7 +24,11 @@ const Navbar = async () => {
 
 			<div className="flex items-center gap-x-2 ms-auto md:col-span-3">
 				{user ? (
-					<UserNav />
+					<UserNav
+						email={user.email!}
+						name={user.given_name!}
+						userImage={user.picture || `https://avatar.vercel.sh/${user.given_name}`}
+					/>
 				) : (
 					<>
 						<Button asChild>
