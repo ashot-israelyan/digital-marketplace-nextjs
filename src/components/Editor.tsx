@@ -1,7 +1,7 @@
 'use client';
 
-import { type Editor, EditorContent, useEditor } from '@tiptap/react';
-import { FC } from 'react';
+import { type Editor, EditorContent, JSONContent, useEditor } from '@tiptap/react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { Button } from '@/components/ui/button';
 import { StarterKit } from '@tiptap/starter-kit';
 
@@ -59,14 +59,22 @@ export const MenuBar: FC<{ editor: Editor | null }> = ({ editor }) => {
 	);
 };
 
-export const TipTapEditor = () => {
+interface ITipTapEditor {
+	json: JSONContent | null;
+	setJson: Dispatch<SetStateAction<JSONContent | null>>;
+}
+
+export const TipTapEditor: FC<ITipTapEditor> = ({ json, setJson }) => {
 	const editor = useEditor({
 		extensions: [StarterKit],
-		content: '<p>Hello World</p>',
+		content: json,
 		editorProps: {
 			attributes: {
 				class: 'focus:outline-none min-h-[150px] prose prose-sm sm:prose-base',
 			},
+		},
+		onUpdate: ({ editor }) => {
+			setJson(editor.getJSON());
 		},
 	});
 
