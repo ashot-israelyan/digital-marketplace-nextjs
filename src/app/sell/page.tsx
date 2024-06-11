@@ -1,9 +1,18 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import SelectCategory from '@/components/SelectCategory';
 import { Textarea } from '@/components/ui/textarea';
 import { TipTapEditor } from '@/components/Editor';
+import { UploadDropzone } from '@/lib/uploadthing';
+import { Button } from '@/components/ui/button';
 
 const Page = () => {
 	return (
@@ -40,7 +49,20 @@ const Page = () => {
 							<Label>Description</Label>
 							<TipTapEditor />
 						</div>
+
+						<div className="flex flex-col gap-y-2">
+							<Label>Product Images</Label>
+							<UploadDropzone endpoint="imageUploader" />
+						</div>
+
+						<div className="flex flex-col gap-y-2">
+							<Label>Product File</Label>
+							<UploadDropzone endpoint="productFileUpload" />
+						</div>
 					</CardContent>
+					<CardFooter className="mt-5">
+						<Button>Submit form</Button>
+					</CardFooter>
 				</form>
 			</Card>
 		</section>
