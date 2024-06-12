@@ -1,6 +1,6 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import {
 	CardContent,
 	CardDescription,
@@ -11,6 +11,9 @@ import {
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import SubmitButton from '@/components/SubmitButton';
+import { useFormState } from 'react-dom';
+import { State, updateUserSettings } from '@/actions';
+import { toast } from 'sonner';
 
 interface IAppProps {
 	firstName: string;
@@ -19,8 +22,19 @@ interface IAppProps {
 }
 
 const SettingsForm: FC<IAppProps> = ({ firstName, lastName, email }) => {
+	const initialState: State = { message: '', status: undefined };
+	const [state, formAction] = useFormState(updateUserSettings, initialState);
+
+	useEffect(() => {
+		if (state.status === 'error') {
+			toast.error(state.message);
+		} else if (state.status === 'success') {
+			toast.success(state.message);
+		}
+	}, [state]);
+
 	return (
-		<form>
+		<form action={formAction}>
 			<CardHeader>
 				<CardTitle>Settings</CardTitle>
 				<CardDescription>Here you will find settings regarding your account</CardDescription>
