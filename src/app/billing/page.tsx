@@ -1,7 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import prisma from '@/lib/db';
-import { Button } from '@/components/ui/button';
+import { createStripeAccountLink, getStripeDashboardLink } from '@/actions';
+import { SubmitButton } from '@/components/SubmitButton';
 
 const getData = async (userId: string) => {
 	const data = await prisma.user.findUnique({
@@ -34,9 +35,13 @@ const BillingRoute = async () => {
 					<CardDescription>Find all your details regarding your payments</CardDescription>
 				</CardHeader>
 				<CardContent>
-					{data?.stripeConnectedLinked === false && (
-						<form>
-							<Button>Link your Account to Stripe</Button>
+					{!data?.stripeConnectedLinked ? (
+						<form action={createStripeAccountLink}>
+							<SubmitButton title="Link your Account to Stripe" />
+						</form>
+					) : (
+						<form action={getStripeDashboardLink}>
+							<SubmitButton title="View Dashboard" />
 						</form>
 					)}
 				</CardContent>

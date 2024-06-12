@@ -135,6 +135,11 @@ export async function buyProduct(formDta: FormData) {
 			smallDescription: true,
 			price: true,
 			images: true,
+			User: {
+				select: {
+					connectedAccountId: true,
+				},
+			},
 		},
 	});
 
@@ -154,9 +159,65 @@ export async function buyProduct(formDta: FormData) {
 				quantity: 1,
 			},
 		],
+		payment_intent_data: {
+			application_fee_amount: Math.round(data!.price * 100) * 0.1,
+			transfer_data: {
+				destination: data?.User?.connectedAccountId as string,
+			},
+		},
 		success_url: 'http://localhost:3000/payment/success',
 		cancel_url: 'http://localhost:3000/payment/cancel',
 	});
 
 	return redirect(session.url as string);
+}
+
+export async function createStripeAccountLink() {
+	const { getUser } = getKindeServerSession();
+	const user = await getUser();
+
+	if (!user) {
+		throw new Error('Something went wrong');
+	}
+
+	const data = await prisma.user.findUnique({
+		where: {
+			id: user.id,
+		},
+		select: {
+			connectedAccountId: true,
+		},
+	});
+
+	const accountLink = await stripe.accountLinks.create({
+		account: data!.connectedAccountId,
+		refresh_url: 'http://localhost:3000/billing',
+		return_url: `http://localhost:3000/return/${data!.connectedAccountId}`,
+		type: 'account_onboarding',
+	});
+
+	return redirect(accountLink.url);
+}
+
+export async function getStripeDashboardLink() {
+	const { getUser } = getKindeServerSession();
+
+	const user = await getUser();
+
+	if (!user) {
+		throw new Error('Unauthorized');
+	}
+
+	const data = await prisma.user.findUnique({
+		where: {
+			id: user.id,
+		},
+		select: {
+			connectedAccountId: true,
+		},
+	});
+
+	const loginLink = await stripe.accounts.createLoginLink(data!.connectedAccountId);
+
+	return redirect(loginLink.url);
 }
