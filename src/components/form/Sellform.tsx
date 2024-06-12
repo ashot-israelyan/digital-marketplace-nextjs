@@ -34,7 +34,7 @@ const SellForm = () => {
 		} else if (state.status === 'error') {
 			toast.error(state.message);
 		}
-	}, [state.status]);
+	}, [state]);
 
 	return (
 		<form action={formAction}>
