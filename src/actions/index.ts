@@ -135,6 +135,7 @@ export async function buyProduct(formDta: FormData) {
 			smallDescription: true,
 			price: true,
 			images: true,
+			productFile: true,
 			User: {
 				select: {
 					connectedAccountId: true,
@@ -159,6 +160,9 @@ export async function buyProduct(formDta: FormData) {
 				quantity: 1,
 			},
 		],
+		metadata: {
+			link: data!.productFile,
+		},
 		payment_intent_data: {
 			application_fee_amount: Math.round(data!.price * 100) * 0.1,
 			transfer_data: {
