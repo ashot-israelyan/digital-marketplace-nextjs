@@ -13,13 +13,12 @@ import SelectCategory from '@/components/SelectCategory';
 import { Textarea } from '@/components/ui/textarea';
 import { TipTapEditor } from '@/components/Editor';
 import { UploadDropzone } from '@/lib/uploadthing';
-import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { JSONContent } from '@tiptap/react';
 import { useFormState } from 'react-dom';
 import { sellProduct, State } from '@/actions';
 import { toast } from 'sonner';
-import SubmitButton from '@/components/SubmitButton';
+import { SubmitButton } from '@/components/SubmitButton';
 
 const SellForm = () => {
 	const initialState: State = { message: '', status: undefined };

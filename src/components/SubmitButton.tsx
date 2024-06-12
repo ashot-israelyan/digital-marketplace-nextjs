@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { FC } from 'react';
 
-const SubmitButton: FC<{ title: string }> = ({ title }) => {
+export const SubmitButton: FC<{ title: string }> = ({ title }) => {
 	const { pending } = useFormStatus();
 
 	return (
@@ -21,4 +21,21 @@ const SubmitButton: FC<{ title: string }> = ({ title }) => {
 	);
 };
 
-export default SubmitButton;
+export const BuyButton: FC<{ price: number }> = ({ price }) => {
+	const { pending } = useFormStatus();
+
+	return (
+		<>
+			{pending ? (
+				<Button disabled>
+					<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+					Please Wait
+				</Button>
+			) : (
+				<Button size="lg" className="w-full mt-10">
+					Buy for ${price}
+				</Button>
+			)}
+		</>
+	);
+};

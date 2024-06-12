@@ -4,6 +4,7 @@ import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import prisma from '@/lib/db';
 import { CategoryTypes } from '@prisma/client';
 import { redirect } from 'next/navigation';
+import { stripe } from '@/lib/stripe';
 
 export type State = {
 	status: 'error' | 'success' | undefined;
@@ -26,14 +27,14 @@ const productSchema = z.object({
 const userSettingsSchema = z.object({
 	firstName: z
 		.string()
-		.min(3, { message: "Minimum length of 3 required" })
-		.or(z.literal(""))
+		.min(3, { message: 'Minimum length of 3 required' })
+		.or(z.literal(''))
 		.optional(),
 
 	lastName: z
 		.string()
-		.min(3, { message: "Minimum length of 3 required" })
-		.or(z.literal(""))
+		.min(3, { message: 'Minimum length of 3 required' })
+		.or(z.literal(''))
 		.optional(),
 });
 
@@ -106,12 +107,12 @@ export async function updateUserSettings(_: State | undefined, formData: FormDat
 
 	const data = await prisma.user.update({
 		where: {
-			id: user.id
+			id: user.id,
 		},
 		data: {
 			firstName: validateFields.data.firstName,
 			lastName: validateFields.data.lastName,
-		}
+		},
 	});
 
 	const state: State = {
@@ -120,4 +121,42 @@ export async function updateUserSettings(_: State | undefined, formData: FormDat
 	};
 
 	return state;
+}
+
+export async function buyProduct(formDta: FormData) {
+	const id = formDta.get('id') as string;
+
+	const data = await prisma.product.findUnique({
+		where: {
+			id,
+		},
+		select: {
+			name: true,
+			smallDescription: true,
+			price: true,
+			images: true,
+		},
+	});
+
+	const session = await stripe.checkout.sessions.create({
+		mode: 'payment',
+		line_items: [
+			{
+				price_data: {
+					currency: 'usd',
+					unit_amount: Math.round(data!.price * 100),
+					product_data: {
+						name: data!.name,
+						description: data!.smallDescription,
+						images: data!.images,
+					},
+				},
+				quantity: 1,
+			},
+		],
+		success_url: 'http://localhost:3000/payment/success',
+		cancel_url: 'http://localhost:3000/payment/cancel',
+	});
+
+	return redirect(session.url as string);
 }
