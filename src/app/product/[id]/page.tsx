@@ -11,6 +11,7 @@ import prisma from '@/lib/db';
 import { JSONContent } from '@tiptap/react';
 import Image from 'next/image';
 import { FC } from 'react';
+import { unstable_noStore as noStore } from 'next/cache';
 
 const getData = async (id: string) => {
 	const data = await prisma.product.findUnique({
@@ -39,6 +40,7 @@ const getData = async (id: string) => {
 };
 
 const ProductPage: FC<{ params: { id: string } }> = async ({ params }) => {
+	noStore();
 	const data = await getData(params.id);
 
 	return (
